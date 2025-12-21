@@ -13,7 +13,7 @@ RECIPES = {
     "Default": "Check for a simple 15-minute recipe online!"
 }
 
-@login_required
+#@login_required
 def dashboard(request):
     if request.method == "POST":
         # Capture inputs from both the custom form and quick buttons
