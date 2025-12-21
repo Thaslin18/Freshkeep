@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-q^y##mr#^#s%n=(f(rw&(^qx&_u(4ge6y9=vu@@()h7e=9_ogh
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['freshkeep-5.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['freshkeep-7.onrender.com', 'localhost', '127.0.0.1']
 ]
 
 INSTALLED_APPS = [
