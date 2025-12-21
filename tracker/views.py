@@ -1,66 +1,69 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import PantryItem
 from django.utils import timezone
-from datetime import timedelta
+from .models import PantryItem
 
-RECIPES = {
-    "Milk": "Make a milkshake or pancakes.",
-    "Eggs": "Try a quick omelette or boiled eggs.",
-    "Bread": "Make french toast or croutons.",
-    "Chicken": "Roast it with herbs or make a stir-fry.",
-    "Spinach": "Add to a smoothie or sauté with garlic.",
-    "Default": "Check for a simple 15-minute recipe online!"
-}
+# Mock/Import your RECIPES dictionary if it's in another file
+# from .constants import RECIPES 
 
-#@login_required
 def dashboard(request):
+    # 1. GATEKEEPER: Setup basic data for everyone (logged in or not)
+    quick_list = ["Milk", "Eggs", "Bread", "Butter", "Apples"]
+    
+    # 2. CHECK LOGIN: If not logged in, show an empty dashboard safely
+    if not request.user.is_authenticated:
+        context = {
+            'items': [], # No items for anonymous users
+            'quick_items': quick_list,
+            'today': timezone.now().date(),
+        }
+        return render(request, 'tracker/dashboard.html', context)
+
+    # 3. POST LOGIC: Handle adding items (Only for logged-in users)
     if request.method == "POST":
-        # Capture inputs from both the custom form and quick buttons
         name = request.POST.get('name')
-        expiry = request.POST.get('expiry_date')
+        expiry = request.POST.get('expiry')
         quick_item = request.POST.get('quick_item')
 
-        # Logic for Custom Entry Box
         if name and expiry:
             PantryItem.objects.create(
-                user=request.user, 
-                name=name, 
+                user=request.user,
+                name=name,
                 expiry_date=expiry
             )
             return redirect('dashboard')
 
-        # Logic for Quick Add Buttons
         elif quick_item:
             PantryItem.objects.create(
                 user=request.user,
                 name=quick_item,
-                expiry_date=timezone.now().date() + timedelta(days=7)
+                expiry_date=timezone.now()
             )
             return redirect('dashboard')
 
-    # --- GET request logic (Loading the page) ---
-    items = PantryItem.objects.filter(user=request.user, is_consumed=False).order_by('expiry_date')
-    
-    # Recipe Logic: Suggests recipes for items that are RED (expiring soon)
+    # 4. GET LOGIC: Loading items & Recipe Logic
+    items = PantryItem.objects.filter(user=request.user, is_consumed=False)
+
+    # Your Recipe Suggestion Logic
     for item in items:
-        if item.status_category() == "RED":
-            item.recipe = RECIPES.get(item.name, RECIPES['Default'])
+        # This assumes status_category() is a method in your Model
+        if hasattr(item, 'status_category') and item.status_category() == "Expired":
+            # Replace 'RECIPES.get' with your actual recipe logic
+            item.recipe = "Suggestion: Use in compost or check safety." 
         else:
             item.recipe = None
-
-    quick_list = ["Milk", "Eggs", "Bread", "Chicken", "Spinach", "Apples", "Bananas", "Cheese", "Butter", "Tomato"]
 
     context = {
         'items': items,
         'quick_items': quick_list,
-        'today': timezone.now().date().isoformat(),
+        'today': timezone.now().date(),
     }
+    
     return render(request, 'tracker/dashboard.html', context)
 
-#@login_required
 def finish_item(request, pk):
+    # Security: Ensure you only finish your own items
     item = get_object_or_404(PantryItem, pk=pk, user=request.user)
     item.is_consumed = True
     item.save()
     return redirect('dashboard')
+
