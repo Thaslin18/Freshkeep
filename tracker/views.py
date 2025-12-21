@@ -58,7 +58,7 @@ def dashboard(request):
     }
     return render(request, 'tracker/dashboard.html', context)
 
-@login_required
+#@login_required
 def finish_item(request, pk):
     item = get_object_or_404(PantryItem, pk=pk, user=request.user)
     item.is_consumed = True
