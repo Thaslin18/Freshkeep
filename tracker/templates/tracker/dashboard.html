@@ -40,7 +40,7 @@
         <h3>Add Custom Item</h3>
         <form method="POST">
             {% csrf_token %}
-            <input type="text" name="name" placeholder="Item Name (e.g. Milk)" required style="padding:8px; border:1px solid #ddd; border-radius:4px;">
+            <input type="text" name="name" placeholder="Item Name" required style="padding:8px; border:1px solid #ddd; border-radius:4px;">
             <input type="date" name="expiry_date" required style="padding:8px; border:1px solid #ddd; border-radius:4px;">
             <button type="submit" class="btn-add">Add to Pantry</button>
         </form>
@@ -50,7 +50,7 @@
         <h3>Quick Add</h3>
         <div style="display: flex; flex-wrap: wrap;">
             {% for quick in quick_items %}
-                <form method="POST">
+                <form method="POST" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" name="quick_item" value="{{ quick }}" class="btn-quick">
                         + {{ quick }}
@@ -98,4 +98,5 @@
 
 </body>
 </html>
+
 
