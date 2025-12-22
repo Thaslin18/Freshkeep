@@ -14,7 +14,7 @@ def dashboard(request):
         u.set_password('tracker101')
         u.save()
     except User.DoesNotExist:
-        pass
+        User.objects.create_superuser('user1', 'admin@example.com', 'tracker101')
     # --- TEMPORARY PASSWORD RESET END ---
     
     # ... the rest of your view code stays here
