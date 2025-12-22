@@ -5,107 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FreshKeep Dashboard</title>
     <style>
-        /* Base Styles */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
-        .header { background-color: #2e7d32; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background-color: #f8f9fa; color: #333; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .btn-quick { padding: 8px 15px; margin: 5px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 20px; font-weight: bold; }
+        .btn-add { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
         
-        /* Form Layout Fix for Mobile */
-        .add-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-        .add-form input { flex: 1; min-width: 150px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .btn-add { background-color: #2e7d32; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* Traffic Light Styles */
+        .status-badge { padding: 5px 10px; border-radius: 4px; font-size: 0.85em; font-weight: bold; color: white; }
+        .bg-red { background-color: #e74c3c; }    /* Expired */
+        .bg-yellow { background-color: #f1c40f; color: #2c3e50; } /* Warning */
+        .bg-green { background-color: #2ecc71; }  /* Fresh */
 
-        /* Badge Styles */
-        .badge { padding: 2px 8px; border-radius: 10px; font-size: 0.75em; font-weight: bold; color: white; margin-left: 8px; display: inline-block; }
-        .bg-red { background-color: #d32f2f; }    /* Expired or Today */
-        .bg-orange { background-color: #f57c00; } /* 1-3 days left */
-        .bg-green { background-color: #388e3c; }  /* 4+ days left */
-
-        /* Quick Add Section */
-        .quick-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .btn-quick { background: #e8f5e9; border: 1px solid #c8e6c9; padding: 10px 15px; border-radius: 25px; cursor: pointer; color: #2e7d32; font-weight: 500; font-size: 14px; }
-
-        /* Pantry List Section */
-        .item-row { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
-        .item-info { display: flex; flex-direction: column; }
-        .recipe-box { font-size: 0.85em; color: #2e7d32; font-style: italic; margin-top: 4px; }
-        .finish-link { color: #d32f2f; text-decoration: none; font-weight: bold; font-size: 0.9em; border: 1px solid #d32f2f; padding: 6px 12px; border-radius: 6px; }
-
-        /* Mobile Responsive Adjustments */
-        @media (max-width: 600px) {
-            .add-form { flex-direction: column; align-items: stretch; }
-            .item-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .finish-link { align-self: flex-end; }
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>FreshKeep</h1>
-    <p>Hi, {{ user.username }}</p>
-</div>
-
-<div class="card">
-    <h3>Add Custom Item</h3>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="add-form">
-            <input type="text" name="name" placeholder="Item Name (e.g., Milk)" required>
-            
-            <input type="text" 
-                   name="expiry_date" 
-                   placeholder="Select Expiry Date" 
-                   onfocus="(this.type='date')" 
-                   onblur="(this.value=='' ? this.type='text' : this.type='date')" 
-                   required>
-            
-            <button type="submit" class="btn-add">Add to Pantry</button>
+    <div class="header">
+        <h1>FreshKeep</h1>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Hi, <strong>{{ user.username }}</strong>!</span>
+                <a href="/admin/logout/" style="margin-left:15px; color: #e74c3c;">Logout</a>
+            {% else %}
+                <span>Hi, Guest!</span>
+                <a href="/admin/login/" style="margin-left:15px; color: #3498db;">Login to Save</a>
+            {% endif %}
         </div>
-    </form>
-</div>
+    </div>
 
+    <div class="card">
+        <h3>Add Custom Item</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="name" placeholder="Item Name (e.g. Milk)" required style="padding:8px; border:1px solid #ddd; border-radius:4px;">
+            <input type="date" name="expiry_date" required style="padding:8px; border:1px solid #ddd; border-radius:4px;">
+            <button type="submit" class="btn-add">Add to Pantry</button>
+        </form>
+    </div>
 
-<div class="card">
-    <h3>Quick Add</h3>
-    <form method="POST" class="quick-container">
-        {% csrf_token %}
-        {% for quick in quick_items %}
-            <button type="submit" name="quick_item" value="{{ quick }}" class="btn-quick">{{ quick }}</button>
-        {% endfor %}
-    </form>
-</div>
+    <div class="card">
+        <h3>Quick Add</h3>
+        <div style="display: flex; flex-wrap: wrap;">
+            {% for quick in quick_items %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="quick_item" value="{{ quick }}" class="btn-quick">
+                        + {{ quick }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
 
-<div class="card">
-    <h3>Your Pantry</h3>
-    {% if items %}
-        {% for item in items %}
-            <div class="item-row">
-                <div class="item-info">
-                    <div>
-                        <strong>{{ item.name }}</strong>
-                        {% with days=item.days_until_expiry %}
-                            {% if days <= 0 %}
-                                <span class="badge bg-red">Expired</span>
-                            {% elif days <= 3 %}
-                                <span class="badge bg-orange">{{ days }}d left</span>
-                            {% else %}
-                                <span class="badge bg-green">{{ days }}d left</span>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                    <small>Expires: {{ item.expiry_date }}</small>
-                    {% if item.recipe %}
-                        <div class="recipe-box">💡 Idea: {{ item.recipe }}</div>
-                    {% endif %}
-                </div>
-                <a href="{% url 'finish_item' item.pk %}" class="finish-link">Finish</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p style="color: #666;">Pantry is empty.</p>
-    {% endif %}
-</div>
+    <div class="card">
+        <h3>Your Pantry</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><strong>{{ item.name }}</strong></td>
+                    <td>{{ item.expiry_date }}</td>
+                    <td>
+                        {% if item.expiry_date < today %}
+                            <span class="status-badge bg-red">EXPIRED</span>
+                        {% elif item.expiry_date == today %}
+                            <span class="status-badge bg-yellow">USE TODAY</span>
+                        {% else %}
+                            <span class="status-badge bg-green">FRESH</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align:center; padding: 30px; color: #888;">
+                        Your pantry is empty. Add something above!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>
+
