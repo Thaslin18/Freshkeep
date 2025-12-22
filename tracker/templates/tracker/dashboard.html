@@ -25,15 +25,7 @@
 
     <div class="header">
         <h1>FreshKeep</h1>
-        <div>
-            {% if user.is_authenticated %}
-                <span>Hi, <strong>{{ user.username }}</strong>!</span>
-                <a href="/admin/logout/" style="margin-left:15px; color: #e74c3c;">Logout</a>
-            {% else %}
-                <span>Hi, Guest!</span>
-                <a href="/admin/login/?next" style="margin-left:15px; color: #3498db;">Login to Save</a>
-            {% endif %}
-        </div>
+        <p>Public Pantry (No Login Required)</p>
     </div>
 
     <div class="card">
