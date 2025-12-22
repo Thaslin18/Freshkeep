@@ -28,5 +28,9 @@ def dashboard(request):
         'quick_items': quick_list,
         'today': today_date,
     })
+def finish_item(request, pk):
+    item = get_object_or_404(PantryItem, pk=pk)
+    item.delete()
+    return redirect('dashboard')
 
 
