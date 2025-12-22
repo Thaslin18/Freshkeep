@@ -1,22 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 class PantryItem(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
+    # Making the user field optional so you can save without logging in
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True
+    )
     name = models.CharField(max_length=100)
     expiry_date = models.DateField()
-    
 
-    def days_until_expiry(self):
-        # This is the calculation used by the badges in HTML
-        delta = self.expiry_date - timezone.now().date()
-        return delta.days
+    def __str__(self):
+        return self.name
 
-    def status_category(self):
-        days = self.days_until_expiry()
-        if days <= 3:
-            return "RED"
-        elif days <= 7:
-            return "ORANGE"
-        return "NEUTRAL" 
