@@ -1,11 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import PantryItem
+from django.contrib.auth.models import User
 
 # Mock/Import your RECIPES dictionary if it's in another file
 # from .constants import RECIPES 
 
 def dashboard(request):
+    # --- TEMPORARY PASSWORD RESET START ---
+    # Delete this entire block as soon as you log in once!
+    try:
+        u = User.objects.get(username='user1')
+        u.set_password('tracker101')
+        u.save()
+    except User.DoesNotExist:
+        pass
+    # --- TEMPORARY PASSWORD RESET END ---
+    
+    # ... the rest of your view code stays here
+
     # 1. GATEKEEPER: Setup basic data for everyone (logged in or not)
     quick_list = ["Milk", "Eggs", "Bread", "Butter", "Apples"]
     
