@@ -80,3 +80,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_URL = 'admin:login'
 STATIC_ROOT = BASE_DIR / "staticfiles"
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
