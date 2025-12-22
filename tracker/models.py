@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class PantryItem(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
     name = models.CharField(max_length=100)
     expiry_date = models.DateField()
-    is_consumed = models.BooleanField(default=False)
+    
 
     def days_until_expiry(self):
         # This is the calculation used by the badges in HTML
