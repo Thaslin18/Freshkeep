@@ -7,15 +7,19 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; padding: 20px; background-color: #f8f9fa; color: #333; }
         .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .header { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         .btn-quick { padding: 8px 15px; margin: 5px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 20px; font-weight: bold; }
         .btn-add { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
         
-        /* Traffic Light Styles */
+        /* Status Badges */
         .status-badge { padding: 5px 10px; border-radius: 4px; font-size: 0.85em; font-weight: bold; color: white; }
         .bg-red { background-color: #e74c3c; }    /* Expired */
         .bg-yellow { background-color: #f1c40f; color: #2c3e50; } /* Warning */
         .bg-green { background-color: #2ecc71; }  /* Fresh */
+
+        /* Delete Button Style */
+        .btn-finish { background: #95a5a6; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: 0.2s; }
+        .btn-finish:hover { background: #7f8c8d; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
@@ -25,7 +29,7 @@
 
     <div class="header">
         <h1>FreshKeep</h1>
-        <p>Public Pantry (No Login Required)</p>
+        <p>Public Pantry Tracker</p>
     </div>
 
     <div class="card">
@@ -60,6 +64,7 @@
                     <th>Item</th>
                     <th>Expiry Date</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -76,10 +81,16 @@
                             <span class="status-badge bg-green">FRESH</span>
                         {% endif %}
                     </td>
+                    <td>
+                        <form action="{% url 'finish_item' item.pk %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-finish">Finish</button>
+                        </form>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3" style="text-align:center; padding: 30px; color: #888;">
+                    <td colspan="4" style="text-align:center; padding: 30px; color: #888;">
                         Your pantry is empty. Add something above!
                     </td>
                 </tr>
@@ -90,5 +101,4 @@
 
 </body>
 </html>
-
 
